@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banez Banez</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Fallback for background image */
+            color: #1e293b; /* Tailwind: text-slate-800 */
+            /* Full page background image */
+            background-image: url('201112-crimescene-stock.jpg'); /* Placeholder image */
+            background-size: cover;
+            background-attachment: fixed; /* Makes the background scroll with the content */
+            background-position: center;
+            position: relative; /* Needed for the overlay */
+            transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for dark mode */
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(248, 250, 252, 0.8); /* Semi-transparent overlay for readability bg-slate-50 with 80% opacity */
+            z-index: -1; /* Ensures the overlay is behind the content */
+        }
+
+        /* Dark Mode styles */
+        .dark body {
+            background-color: #1a202c; /* Dark background */
+            color: #e2e8f0; /* Light text */
+            /* background-image: url('dark-crime-scene.jpg'); /* Optional: different dark mode background if you have one */ */
+        }
+
+        .dark body::before {
+            background-color: rgba(26, 32, 44, 0.85); /* Darker overlay for dark mode */
+        }
+
+        .dark .bg-white {
+            background-color: #2d3748 !important; /* Darker background for white elements */
+        }
+
+        .dark .bg-slate-50 {
+            background-color: #4a5568 !important; /* Darker background for slate-50 elements */
+        }
+
+        .dark .text-slate-700 {
+            color: #cbd5e0 !important; /* Lighter text in dark mode */
+        }
+        .dark .text-slate-600 {
+            color: #a0aec0 !important; /* Lighter text in dark mode */
+        }
+        .dark .text-green-800 {
+            color: #68d391 !important; /* Lighter green for headers */
+        }
+        .dark .text-green-700 {
+            color: #48bb78 !important; /* Lighter green for subheaders */
+        }
+        .dark .text-green-600 {
+            color: #38a169 !important; /* Lighter green for icons */
+        }
+        .dark .group-hover\:bg-green-100:hover {
+            background-color: #2f855a !important; /* Darker hover effect */
+        }
+        .dark .bg-green-50 {
+            background-color: #2d3748 !important;
+        }
+        .dark .hover\:text-green-200:hover {
+            color: #90cdf4 !important; /* Lighter hover text */
+        }
+        .dark .border-green-200 {
+            border-color: #48bb78 !important;
+        }
+        .dark .shadow-lg {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.05) !important;
+        }
+        .dark .bg-green-700 {
+            background-color: #2f855a !important;
+        }
+        .dark .hover\:bg-green-800:hover {
+            background-color: #276749 !important;
+        }
+        .dark #favoriteStudentBtn {
+            background-color: #2d3748 !important;
+            color: #a0aec0 !important;
+        }
+        .dark #favoriteStudentBtn.text-red-500 {
+            color: #ef4444 !important;
+        }
+        
+        .dark .bg-white {
+            background-color: #2d3748 !important; /* Darker background for white elements */
+        }
+        
+        .dark .text-white { /* This rule is overriding the SVG's text-white */
+            color: #cbd5e0 !important; /* Lighter text for white elements in dark mode */
+        }
+        
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; /* Tailwind: bg-slate-100 */
+        }
+        .dark ::-webkit-scrollbar-track {
+            background: #2d3748; /* Darker track */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #64748b; /* Tailwind: bg-slate-500 */
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #718096; /* Lighter thumb for dark mode */
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569; /* Tailwind: bg-slate-600 */
+            cursor: grab;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #5a67d8; /* Darker hover thumb for dark mode */
+        }
+
+        /* Accordion specific styles */
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+        }
+        .accordion-content.active {
+            max-height: 500px; /* Sufficiently large value */
+            padding-top: 1rem; /* pt-4 equivalent */
+        }
+        .accordion-button.active .arrow {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <header class="bg-green-800 text-white shadow-lg py-4 px-6 md:px-8">
+        <div class="container mx-auto flex justify-between items-center">
+            <a href="https://www.uc-bcf.edu.ph/" class="text-2xl md:text-3xl font-bold flex items-center group">
+                <span class="mr-2 transform transition duration-300 group-hover:scale-110">🎓</span>
+                University of the Cordilleras
+            </a>
+            <!-- Desktop Navigation -->
+            <nav id="main-nav" class="hidden md:flex space-x-6 items-center">
+                <a href="https://www.uc-bcf.edu.ph/" target="blank" class="hover:text-green-200 transition duration-300 px-3 py-2 rounded-md">Home</a>
+                <a href="#overview" class="hover:text-green-200 transition duration-300 px-3 py-2 rounded-md">Course Overview</a>
+                <a href="#curriculum" class="hover:text-green-200 transition duration-300 px-3 py-2 rounded-md">Subject</a>
+                <a href="#admissions" class="hover:text-green-200 transition duration-300 px-3 py-2 rounded-md">Admissions</a>
+                <a href="#objective" class="hover:text-green-200 transition duration-300 px-3 py-2 rounded-md">Objective</a>
+                <a href="#student-spotlight" class="hover:text-green-200 transition duration-300 px-3 py-2 rounded-md">Student Spotlight</a>
+                <!-- Desktop Dark Mode Toggle -->
+                <button id="darkModeToggleDesktop" class="p-2 rounded-full hover:bg-white-700 transition duration-300 focus:outline-none">
+                    <svg class="w-6 h-6 text-white dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+            </nav>
+            <!-- Mobile-specific elements: Dark Mode Toggle and Mobile Menu Button -->
+            <div class="flex items-center space-x-4 md:hidden">
+                <button id="darkModeToggleMobile" class="p-2 rounded-full hover:bg-white-700 transition duration-300 focus:outline-none">
+                    <svg class="w-6 h-6 text-white dark:text-yellow-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                    </svg>
+                </button>
+                <button id="mobile-menu-button" class="focus:outline-none">
+                    <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <nav id="mobile-menu" class="md:hidden bg-green-700 text-white py-4 px-6 absolute w-full z-10 hidden shadow-md">
+        <a href="https://www.uc-bcf.edu.ph/" target="blank" class="block py-2 px-4 hover:bg-green-600 rounded-md transition duration-200" onclick="toggleMobileMenu()">Home</a>
+        <a href="#overview" class="block py-2 px-4 hover:bg-green-600 rounded-md transition duration-200" onclick="toggleMobileMenu()">Course Overview</a>
+        <a href="#curriculum" class="block py-2 px-4 hover:bg-green-600 rounded-md transition duration-200" onclick="toggleMobileMenu()">Subject</a>
+        <a href="#admissions" class="block py-2 px-4 hover:bg-green-600 rounded-md transition duration-200" onclick="toggleMobileMenu()">Admissions</a>
+        <a href="#objective" class="block py-2 px-4 hover:bg-green-600 rounded-md transition duration-200" onclick="toggleMobileMenu()">Objective</a>
+        <a href="#student-spotlight" class="block py-2 px-4 hover:bg-green-600 rounded-md transition duration-200" onclick="toggleMobileMenu()">Student Spotlight</a>
+    </nav>
+
+    <main class="flex-grow">
+        <section id="home" class="py-20 px-6 text-center shadow-inner relative z-0" style="background-image: url('RI-CP.jpg'); background-size: cover; background-position: center;">
+            <div class="absolute inset-0 bg-gradient-to-r from-green-100 to-green-150 opacity-90"></div>
+            <div class="relative container mx-auto z-10 text-green">
+                <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight">
+                    Shaping Justice, Building Futures
+                </h1>
+                <p class="text-lg md:text-xl mb-8 max-w-3xl mx-auto">
+                    The Criminology Program at the University of the Cordilleras offers a comprehensive and dynamic education, preparing students for impactful careers in law enforcement, public safety, and justice.
+                </p>
+                <a href="https://www.uc-bcf.edu.ph/college/of/criminal-justice-education" target="_blank" class="bg-white text-green-800 px-8 py-3 rounded-full text-lg font-semibold hover:bg-green-100 transition duration-300 transform hover:scale-105 shadow-lg">
+                    Explore Our Program
+                </a>
+            </div>
+        </section>
+
+              <!-- Objective Section -->
+        <section id="objective" class="py-16 px-6 bg-white bg-opacity-90 relative z-10 rounded-lg mx-4 md:mx-auto max-w-4xl shadow-lg mt-8">
+            <div class="container mx-auto max-w-4xl text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-green-800 mb-10"> Project Objective</h2>
+                <div class="bg-slate-50 p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <p class="text-lg text-slate-700 mb-4 leading-relaxed">
+                        This website is created solely for **academic and school project purposes**.
+                    </p>
+                    <p class="text-lg text-slate-700 mb-4 leading-relaxed">
+                        Please note that any names(except student Banez), personal identities, and specific student information featured on this site are **fictitious and used for illustrative purposes only**. They do not represent real individuals or their actual details.
+                    </p>
+                </div>
+            </div>
+        </section>
+        <!-- End Objective Section -->
+
+        <section id="overview" class="py-16 px-6 bg-white bg-opacity-90 relative z-10 rounded-lg mx-4 md:mx-auto max-w-4xl shadow-lg mt-8">
+            <div class="container mx-auto max-w-4xl">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-green-800 mb-10">Course Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <h3 class="text-xl font-semibold mb-3 text-green-700">Holistic Education</h3>
+                        <p class="text-slate-700 leading-relaxed">
+                            Our Bachelor of Science in Criminology program integrates theoretical knowledge with practical skills, focusing on the scientific study of crime, criminal behavior, and the justice system. We aim to develop critical thinkers and ethical professionals.
+                        </p>
+                    </div>
+                    <div class="bg-slate-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <h3 class="text-xl font-semibold mb-3 text-green-700">Career Opportunities</h3>
+                        <p class="text-slate-700 leading-relaxed">
+                            Graduates are prepared for diverse roles in law enforcement agencies (PNP, NBI, BJMP, BFP), correctional services, private security, forensics, and legal professions. Our alumni are highly sought after in the public and private sectors.
+                        </p>
+                    </div>
+                </div>
+                <div class="mt-8 bg-slate-50 p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <h3 class="text-xl font-semibold mb-3 text-green-700">Mission and Vision</h3>
+                    <p class="text-slate-700 leading-relaxed">
+                        The Criminology Department envisions producing competent, compassionate, and community-oriented criminologists who uphold justice, promote peace and order, and contribute to national development. Our mission is to provide quality education and foster a culture of research and service.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <section id="curriculum" class="py-16 px-6 bg-green-50 bg-opacity-90 relative z-10 rounded-lg mx-4 md:mx-auto max-w-4xl shadow-lg mt-8">
+            <div class="container mx-auto max-w-4xl">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-green-800 mb-10">Subject Highlights</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <button class="accordion-button w-full flex justify-between items-center text-lg font-semibold text-green-700 mb-2 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="text-4xl text-green-600 mr-3">⚖️</span>
+                                CRIMINOLOGY 1 : Introduction to Criminology
+                            </span>
+                            <span class="arrow transition-transform duration-300 text-green-600 text-2xl">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="text-sm text-slate-600">The primary aim of Criminology 1 is to provide students with a foundational understanding of crime as a social phenomenon. It encourages critical thinking about the causes of crime, the effectiveness of various crime control strategies, and the complex relationship between crime, individuals, and society. This course is crucial for anyone considering a career in law enforcement, corrections, social work, legal professions, or any field related to public safety and justice.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <button class="accordion-button w-full flex justify-between items-center text-lg font-semibold text-green-700 mb-2 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="text-4xl text-green-600 mr-3">🔍</span>
+                                CLJ1 : Introduction to Philippine Criminal Justice System
+                            </span>
+                            <span class="arrow transition-transform duration-300 text-green-600 text-2xl">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="text-sm text-slate-600">This course provides a comprehensive overview of the five pillars of the Philippine Criminal Justice System: Law Enforcement, Prosecution, Courts, Corrections, and Community. Students will learn about the roles, functions, and interrelationships of these components, as well as the challenges and reforms within the system.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <button class="accordion-button w-full flex justify-between items-center text-lg font-semibold text-green-700 mb-2 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="text-4xl text-green-600 mr-3">🚨</span>
+                                LEA 1N: Law Enforcement Organization & Administration
+                            </span>
+                            <span class="arrow transition-transform duration-300 text-green-600 text-2xl">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="text-sm text-slate-600">Focuses on the principles of police organization and management, including personnel management, police operations, intelligence gathering, and public relations. It covers the structures and functions of various law enforcement agencies in the Philippines and abroad.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <button class="accordion-button w-full flex justify-between items-center text-lg font-semibold text-green-700 mb-2 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="text-4xl text-green-600 mr-3">👨‍⚖️</span>
+                                CDI 1: Fundamentals of Criminal Investigation & Intelligence
+                            </span>
+                            <span class="arrow transition-transform duration-300 text-green-600 text-2xl">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="text-sm text-slate-600">This course introduces the fundamental principles and techniques of criminal investigation. Topics include crime scene processing, evidence collection and preservation, interviewing and interrogation, surveillance, and the role of intelligence in solving crimes.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <button class="accordion-button w-full flex justify-between items-center text-lg font-semibold text-green-700 mb-2 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="text-4xl text-green-600 mr-3">🧠</span>
+                                CLJ 2N: Human Rights Education
+                            </span>
+                            <span class="arrow transition-transform duration-300 text-green-600 text-2xl">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="text-sm text-slate-600">Explores the concept of human rights within the context of criminal justice. It emphasizes the importance of human dignity and due process, examining international and national human rights instruments and their implications for law enforcement, corrections, and legal practice.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <button class="accordion-button w-full flex justify-between items-center text-lg font-semibold text-green-700 mb-2 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="text-4xl text-green-600 mr-3">📊</span>
+                                CRIMINOLOGY 2: Theories of Crime Causation
+                            </span>
+                            <span class="arrow transition-transform duration-300 text-green-600 text-2xl">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="text-sm text-slate-600">Delves into various criminological theories explaining why individuals commit crimes. It covers classical, positivist, sociological, psychological, and modern theories of crime, providing students with analytical frameworks to understand criminal behavior.</p>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                        <button class="accordion-button w-full flex justify-between items-center text-lg font-semibold text-green-700 mb-2 focus:outline-none">
+                            <span class="flex items-center">
+                                <span class="text-4xl text-green-600 mr-3">💻</span>
+                                TECH 101: IT Application Tools in Criminal Justice and Public Safety
+                            </span>
+                            <span class="arrow transition-transform duration-300 text-green-600 text-2xl">▼</span>
+                        </button>
+                        <div class="accordion-content">
+                            <p class="text-sm text-slate-600">Introduces students to the essential information technology tools and applications used in criminal justice and public safety operations. Topics include data management systems, forensic software, cybersecurity basics, and digital evidence handling.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="admissions" class="py-16 px-6 bg-green-50 bg-opacity-90 relative z-10 rounded-lg mx-4 md:mx-auto max-w-3xl shadow-lg mt-8">
+            <div class="container mx-auto max-w-3xl text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-green-800 mb-10">Admissions Information</h2>
+                <div class="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition duration-300">
+                    <p class="text-lg text-slate-700 mb-6 leading-relaxed">
+                        Ready to join the ranks of future criminologists? Admission to the Criminology program requires passing the University's entrance examination and meeting specific academic qualifications.
+                    </p>
+                    <p class="text-lg text-slate-700 mb-6 leading-relaxed">
+                        For detailed requirements, application forms, and important dates, please visit the University of the Cordilleras Admissions Office or refer to the official UC website.
+                    </p>
+                    <a href="https://www.uc-bcf.edu.ph/admission-enrollment/ugp" target="_blank" class="inline-block bg-green-700 text-white px-8 py-3 rounded-full text-lg font-semibold hover:bg-green-800 transition duration-300 transform hover:scale-105 shadow-lg">
+                        Visit UC Admissions Page
+                        <span class="ml-2">→</span>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="student-spotlight" class="py-16 px-6 bg-white bg-opacity-90 relative z-10 rounded-lg mx-4 md:mx-auto max-w-4xl shadow-lg mt-8 mb-8">
+            <div class="container mx-auto max-w-4xl text-center">
+                <h2 class="text-3xl md:text-4xl font-bold text-center text-green-800 mb-10">Student Spotlight</h2>
+                <div class="relative flex items-center justify-center">
+                    <button id="prevStudentBtn" class="absolute left-0 bg-green-700 text-white p-2 rounded-full shadow-md hover:bg-green-800 transition duration-300 z-20 focus:outline-none ml-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+
+                    <div id="studentCardContainer" class="bg-slate-50 p-8 rounded-lg shadow-md transition-all duration-500 ease-in-out max-w-2xl mx-auto relative overflow-hidden">
+                        <img id="studentImage" src="" alt="Student Profile Picture" class="rounded-full mx-auto mb-6 border-4 border-green-200 w-32 h-32 object-cover transition-opacity duration-300">
+                        <h3 id="studentName" class="text-2xl font-semibold text-green-700 mb-2">
+                            <a href="#" id="studentNameLink" class="cursor-pointer hover:underline"></a>
+                        </h3>
+                        <p id="studentTitle" class="text-slate-600 mb-4"></p>
+                        <p id="studentQuote" class="text-lg text-slate-700 leading-relaxed"></p>
+                        <button id="favoriteStudentBtn" class="absolute top-4 right-4 p-2 rounded-full bg-white text-gray-400 hover:text-red-500 hover:bg-red-50 transition duration-300 shadow-md">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd"></path>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <button id="nextStudentBtn" class="absolute right-0 bg-green-700 text-white p-2 rounded-full shadow-md hover:bg-green-800 transition duration-300 z-20 focus:outline-none mr-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <div id="studentInfoModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative">
+            <button id="closeModalBtn" class="absolute top-3 right-3 text-gray-500 hover:text-gray-800 text-2xl font-bold">
+                &times;
+            </button>
+            <h3 class="text-2xl font-semibold text-green-700 mb-4">Student Information</h3>
+            <p class="text-slate-600 mb-2"><strong>Name:</strong> <span id="modalStudentName"></span></p>
+            <p class="text-slate-600 mb-2"><strong>Student ID:</strong> <span id="modalStudentID"></span></p>
+            <p class="text-slate-600 mb-4"><strong>Address:</strong> <span id="modalStudentAddress"></span></p>
+            <h3 class="text-2xl font-semibold text-green-700 mb-4">Contact Details</h3>
+            <p class="text-slate-600 mb-2"><strong>Phone:</strong> <span id="modalStudentPhone"></span></p>
+            <p class="text-slate-600 mb-2"><strong>Email:</strong> <span id="modalStudentEmail"></span></p>
+            <p class="text-slate-600 mb-4"><strong>Emergency Contact:</strong> <span id="modalStudentEmergency"></span></p>
+        </div>
+    </div>
+
+        <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 z-50 hidden">
+        <div class="relative">
+            <button id="closeImageModalBtn" class="absolute top-2 right-2 bg-white text-gray-800 rounded-full h-8 w-8 flex items-center justify-center text-xl font-bold opacity-75 hover:opacity-100 transition-opacity">
+                &times;
+            </button>
+            <img id="maximizedImage" src="" alt="Maximized Student Image" class="max-w-full max-h-[90vh] object-contain rounded-lg shadow-lg">
+        </div>
+    </div>
+
+    <button id="backToTopBtn" class="fixed bottom-6 right-6 bg-green-700 text-white p-3 rounded-full shadow-lg hover:bg-green-800 focus:outline-none transition-all duration-300 opacity-0 invisible z-40">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+        </svg>
+    </button>
+
+    <footer class="bg-green-900 text-white py-8 px-6 mt-10 relative z-10">
+        <div class="container mx-auto text-center">
+            <p class="mb-4 text-lg">University of the Cordilleras</p>
+            <p class="mb-2">Governor Pack Rd, Baguio, 2600 Benguet, Philippines</p>
+            <p class="mb-4">Phone: +63 (74) 000-0000 | Email: its-info@pii.educ.ph</p>
+            <div class="flex justify-center space-x-4 mb-4 text-green-200">
+                <a href="https://www.facebook.com/UC.BCF" target="_blank" class="hover:text-white transition duration-200">Facebook</a>
+                <a href="#" class="hover:text-white transition duration-200">Twitter</a>
+                <a href="#" class="hover:text-white transition duration-200">Instagram</a>
+            </div>
+            <p class="text-sm">&copy; 2025 University of the Cordilleras. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- Student Data (no database needed!) ---
+        const students = [
+            {
+                id: 'bruceBanez',
+                name: 'Bruce W. Banez',
+                title: 'Aspiring PNP',
+                quote: "Born a second child to loving parents who prioritize their children's education. Studying Criminal Justice is a dedication not just for me, but for my family and my future family.",
+                image: '1000005048.jpg',
+                details: {
+                    studentId: '2024-00001',
+                    address: '123 Criminology St., Baguio City',
+                    phone: '+63 917 123 4567',
+                    email: 'bruce.banez@uc.edu.ph',
+                    emergencyContact: '+63 998 765 4321'
+                }
+            },
+            {
+                id: 'claireDelaCruz',
+                name: 'Claire A. Simpsons',
+                title: 'Future Forensic Scientist',
+                quote: "The hands-on experience in criminalistics here has been invaluable. I'm excited to use science to uncover the truth and contribute to justice.",
+                image: 'studentA.png', // Make sure this image exists!
+                details: {
+                    studentId: '2024-00000',
+                    address: '456 Forensics Ave., Baguio City',
+                    phone: '+63 918 234 0000',
+                    email: 'claire.delacruz@email.com',
+                    emergencyContact: '+63 999 000 5432'
+                }
+            },
+            {
+                id: 'danielReyes',
+                name: 'Daniel B. Mortigai',
+                title: 'Community Corrections Advocate',
+                quote: "I believe in rehabilitation and second chances. UC's criminology program taught me the importance of community involvement in reducing recidivism.",
+                image: 'studentB.jpeg', // Make sure this image exists!
+                details: {
+                    studentId: '2024-asfs',
+                    address: '789 Justice Blvd., Baguio City',
+                    phone: '+63 919 345 6789',
+                    email: 'daniel.reyes@eh.egul.ph',
+                    emergencyContact: '+63 917 654 3210'
+                }
+            },
+            {
+                id: 'sophiaLim',
+                name: 'Sophia C. Lima-anim',
+                title: 'Victim Support Specialist',
+                quote: "Being able to understand the victim's perspective and provide support is incredibly fulfilling. This program truly empowers us to make a difference.",
+                image: 'studentC.png', // Make sure this image exists!
+                details: {
+                    studentId: '2024-1111',
+                    address: '101 Safe Haven St., Baguio City',
+                    phone: '+63 000 456 7890',
+                    email: 'sophia.lim@uh.com',
+                    emergencyContact: '+63 908 765 4321'
+                }
+            }
+        ];
+
+        let currentStudentIndex = 0; // Keep track of which student is currently displayed
+
+        // --- DOM Elements for Student Spotlight ---
+        const studentCardContainer = document.getElementById('studentCardContainer');
+        const studentImage = document.getElementById('studentImage');
+        const studentName = document.getElementById('studentName');
+        const studentNameLink = document.getElementById('studentNameLink');
+        const studentTitle = document.getElementById('studentTitle');
+        const studentQuote = document.getElementById('studentQuote');
+        const prevStudentBtn = document.getElementById('prevStudentBtn');
+        const nextStudentBtn = document.getElementById('nextStudentBtn');
+
+        // --- DOM Elements for Student Info Modal ---
+        const studentInfoModal = document.getElementById('studentInfoModal');
+        const closeModalBtn = document.getElementById('closeModalBtn');
+        const modalStudentName = document.getElementById('modalStudentName');
+        const modalStudentID = document.getElementById('modalStudentID');
+        const modalStudentAddress = document.getElementById('modalStudentAddress');
+        const modalStudentPhone = document.getElementById('modalStudentPhone');
+        const modalStudentEmail = document.getElementById('modalStudentEmail');
+        const modalStudentEmergency = document.getElementById('modalStudentEmergency');
+
+        // --- Student Favorite Feature ---
+        const favoriteStudentBtn = document.getElementById('favoriteStudentBtn');
+
+        // Function to update the displayed student
+        function displayStudent(index) {
+            // Fade out current content
+            studentCardContainer.classList.add('opacity-0');
+
+            setTimeout(() => {
+                const student = students[index];
+                if (!student) return; // Guard clause
+
+                studentImage.src = student.image;
+                studentNameLink.textContent = student.name;
+                studentTitle.textContent = student.title;
+                studentQuote.textContent = student.quote;
+
+                // Update modal content (but keep it hidden)
+                modalStudentName.textContent = student.name;
+                modalStudentID.textContent = student.details.studentId;
+                modalStudentAddress.textContent = student.details.address;
+                modalStudentPhone.textContent = student.details.phone;
+                modalStudentEmail.textContent = student.details.email;
+                modalStudentEmergency.textContent = student.details.emergencyContact;
+
+                // Update favorite button state for the current student
+                loadFavoriteStatus(student.id);
+
+                // Fade in new content
+                studentCardContainer.classList.remove('opacity-0');
+            }, 300); // Wait for fade-out transition
+        }
+
+        // Functions to navigate students
+        function showNextStudent() {
+            currentStudentIndex = (currentStudentIndex + 1) % students.length;
+            displayStudent(currentStudentIndex);
+        }
+
+        function showPrevStudent() {
+            currentStudentIndex = (currentStudentIndex - 1 + students.length) % students.length;
+            displayStudent(currentStudentIndex);
+        }
+
+        // Event listeners for navigation
+        nextStudentBtn.addEventListener('click', showNextStudent);
+        prevStudentBtn.addEventListener('click', showPrevStudent);
+
+        // --- Load favorite status for a given student ID ---
+        function loadFavoriteStatus(studentId) {
+            const favorites = JSON.parse(localStorage.getItem('studentFavorites')) || {};
+            if (favorites[studentId]) {
+                favoriteStudentBtn.classList.add('text-red-500'); // Change color if favorited
+            } else {
+                favoriteStudentBtn.classList.remove('text-red-500');
+            }
+        }
+
+        // Toggle favorite status on click
+        favoriteStudentBtn.addEventListener('click', () => {
+            const currentStudentId = students[currentStudentIndex].id;
+            let favorites = JSON.parse(localStorage.getItem('studentFavorites')) || {};
+
+            if (favorites[currentStudentId]) {
+                delete favorites[currentStudentId]; // Unfavorite
+                favoriteStudentBtn.classList.remove('text-red-500');
+            } else {
+                favorites[currentStudentId] = true; // Favorite
+                favoriteStudentBtn.classList.add('text-red-500');
+            }
+            localStorage.setItem('studentFavorites', JSON.stringify(favorites));
+        });
+
+        // --- Mobile Menu Toggle ---
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        function toggleMobileMenu() {
+            mobileMenu.classList.toggle('hidden');
+        }
+        mobileMenuButton.addEventListener('click', toggleMobileMenu);
+
+        // Close mobile menu when a link is clicked
+        document.querySelectorAll('#mobile-menu a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.add('hidden');
+            });
+        });
+
+        // --- Smooth Scroll for Internal Links ---
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+
+                if (targetElement) {
+                    window.scrollTo({
+                        top: targetElement.offsetTop - (document.querySelector('header').offsetHeight || 0), // Adjust for fixed header
+                        behavior: 'smooth'
+                    });
+                }
+            });
+        });
+
+        // --- Student Info Modal Logic (opens current student's full details) ---
+        studentNameLink.addEventListener('click', function(e) {
+            e.preventDefault();
+            studentInfoModal.classList.remove('hidden');
+        });
+
+        closeModalBtn.addEventListener('click', function() {
+            studentInfoModal.classList.add('hidden');
+        });
+
+        studentInfoModal.addEventListener('click', function(e) {
+            if (e.target === studentInfoModal) {
+                studentInfoModal.classList.add('hidden');
+            }
+        });
+
+         // --- Image Maximization Logic ---
+        studentImage.addEventListener('click', () => {
+            maximizedImage.src = studentImage.src; // Set the source of the maximized image
+            imageModal.classList.remove('hidden'); // Show the image modal
+        });
+
+        closeImageModalBtn.addEventListener('click', () => {
+            imageModal.classList.add('hidden'); // Hide the image modal
+        });
+
+        // Close image modal when clicking outside
+        imageModal.addEventListener('click', (e) => {
+            if (e.target === imageModal) {
+                imageModal.classList.add('hidden');
+            }
+        });
+        // --- Accordion Logic for Subject Highlights ---
+        const accordionButtons = document.querySelectorAll('.accordion-button');
+
+        accordionButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling; // Get the .accordion-content div
+
+                // Close all other open accordions
+                accordionButtons.forEach(otherButton => {
+                    if (otherButton !== button && otherButton.classList.contains('active')) {
+                        otherButton.classList.remove('active');
+                        otherButton.nextElementSibling.classList.remove('active');
+                    }
+                });
+
+                // Toggle the clicked accordion
+                button.classList.toggle('active');
+                content.classList.toggle('active');
+            });
+        });
+
+
+        // --- Dark Mode Toggle Logic ---
+        const darkModeToggleDesktop = document.getElementById('darkModeToggleDesktop');
+        const darkModeToggleMobile = document.getElementById('darkModeToggleMobile');
+        const htmlElement = document.documentElement; // Refers to the <html> tag
+
+        // Function to apply/remove dark mode
+        function toggleDarkMode() {
+            if (htmlElement.classList.contains('dark')) {
+                htmlElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Check for saved theme preference on page load
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            htmlElement.classList.add('dark');
+        } else if (savedTheme === 'light') {
+            htmlElement.classList.remove('dark');
+        } else {
+            // If no preference, check system preference
+            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                htmlElement.classList.add('dark');
+            }
+        }
+
+        // Add event listeners to both toggle buttons
+        darkModeToggleDesktop.addEventListener('click', toggleDarkMode);
+        darkModeToggleMobile.addEventListener('click', toggleDarkMode);
+
+        // --- Back to Top Button Logic ---
+        const backToTopBtn = document.getElementById('backToTopBtn');
+
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) { // Show button after scrolling down 300px
+                backToTopBtn.classList.remove('opacity-0', 'invisible');
+                backToTopBtn.classList.add('opacity-100', 'visible');
+            } else {
+                backToTopBtn.classList.remove('opacity-100', 'visible');
+                backToTopBtn.classList.add('opacity-0', 'invisible');
+            }
+        });
+
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+
+        // --- Initialize on page load ---
+        document.addEventListener('DOMContentLoaded', () => {
+            displayStudent(currentStudentIndex); // Display the first student
+        });
+
+    </script>
+    
+</body>
+</html>
+```
